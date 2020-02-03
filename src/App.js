@@ -8,10 +8,8 @@ function App() {
 		styles,
 		fontSize,
 		fontScale,
-		lineHeight,
 		setFontScale,
 		setFontSize,
-		setLineHeight,
 		textAlign,
 		setTextAlign,
 	} = useStyles();
@@ -19,7 +17,6 @@ function App() {
 	const createInputHandler = fn => event => fn(event.target.value);
 	const handleOnChangeFontSize = createInputHandler(setFontSize);
 	const handleOnChangeFontScale = createInputHandler(setFontScale);
-	const handleOnChangeLineHeight = createInputHandler(setLineHeight);
 	const handleOnChangeTextAlign = createInputHandler(setTextAlign);
 
 	const textAlignOptions = [
@@ -67,14 +64,7 @@ function App() {
 							max="1.5"
 							step="0.025"
 						/>
-						<RangeControl
-							label="Line Height"
-							onChange={handleOnChangeLineHeight}
-							value={lineHeight}
-							min="1.1"
-							max="2"
-							step="0.05"
-						/>
+
 						<SelectControl
 							label="Text Align"
 							value={textAlign}
@@ -89,18 +79,29 @@ function App() {
 }
 
 const useStyles = () => {
+	const baseFontScale = 1.2;
+	const baseLineHeight = 1.5;
+	const baseLineHeightTitleMultiplier = 0.7334;
+
 	const [fontSize, setFontSize] = useState(16);
-	const [fontScale, setFontScale] = useState(1.2);
-	const [lineHeight, setLineHeight] = useState(1.5);
+	const [fontScale, setFontScale] = useState(baseFontScale);
 	const [textAlign, setTextAlign] = useState("left");
 
 	const [styles, setStyles] = useState("");
 
 	const prevStyle = useRef("");
 
-	let nextStyle = [":root {"];
+	const lineHeightOffsetMultiplier = fontScale - baseFontScale + 1;
+	const lineHeightMultiplier = baseLineHeight / baseFontScale;
+	const lineHeight =
+		fontScale * lineHeightMultiplier * lineHeightOffsetMultiplier;
 
-	const titleLineHeight = (lineHeight * 0.7334).toFixed(2);
+	const baseLineHeightTitle = lineHeight / lineHeightOffsetMultiplier;
+	const titleLineHeight = (
+		baseLineHeightTitle * baseLineHeightTitleMultiplier
+	).toFixed(2);
+
+	let nextStyle = [":root {"];
 
 	nextStyle.push(`--wp-font-size: ${fontSize}px;`);
 	nextStyle.push(`--wp-font-title-line-height: ${titleLineHeight};`);
@@ -138,7 +139,6 @@ const useStyles = () => {
 		fontScale,
 		setFontScale,
 		lineHeight,
-		setLineHeight,
 		textAlign,
 		setTextAlign,
 	};
