@@ -12,12 +12,30 @@ function App() {
 		setFontScale,
 		setFontSize,
 		setLineHeight,
+		textAlign,
+		setTextAlign,
 	} = useStyles();
 
 	const createInputHandler = fn => event => fn(event.target.value);
 	const handleOnChangeFontSize = createInputHandler(setFontSize);
 	const handleOnChangeFontScale = createInputHandler(setFontScale);
 	const handleOnChangeLineHeight = createInputHandler(setLineHeight);
+	const handleOnChangeTextAlign = createInputHandler(setTextAlign);
+
+	const textAlignOptions = [
+		{
+			value: "left",
+			label: "Left",
+		},
+		{
+			value: "center",
+			label: "Center",
+		},
+		{
+			value: "right",
+			label: "Right",
+		},
+	];
 
 	return (
 		<Editor>
@@ -57,6 +75,12 @@ function App() {
 							max="2"
 							step="0.05"
 						/>
+						<SelectControl
+							label="Text Align"
+							value={textAlign}
+							onChange={handleOnChangeTextAlign}
+							options={textAlignOptions}
+						/>
 					</SidebarPanel>
 				</ScrollableContent>
 			</Sidebar>
@@ -68,7 +92,10 @@ const useStyles = () => {
 	const [fontSize, setFontSize] = useState(16);
 	const [fontScale, setFontScale] = useState(1.2);
 	const [lineHeight, setLineHeight] = useState(1.5);
+	const [textAlign, setTextAlign] = useState("left");
+
 	const [styles, setStyles] = useState("");
+
 	const prevStyle = useRef("");
 
 	let nextStyle = [":root {"];
@@ -78,6 +105,7 @@ const useStyles = () => {
 	nextStyle.push(`--wp-font-size: ${fontSize}px;`);
 	nextStyle.push(`--wp-font-title-line-height: ${titleLineHeight};`);
 	nextStyle.push(`--wp-font-line-height: ${lineHeight};`);
+	nextStyle.push(`--wp-font-text-align: ${textAlign};`);
 
 	const typeSizes = {
 		h1: 5,
@@ -111,16 +139,43 @@ const useStyles = () => {
 		setFontScale,
 		lineHeight,
 		setLineHeight,
+		textAlign,
+		setTextAlign,
 	};
 };
 
-function RangeControl({ label, value, ...props }) {
+function BaseControl({ label, value, ...props }) {
 	return (
 		<Label>
 			<LabelText>
 				{label} ({value})
 			</LabelText>
-			<input type="range" {...props} value={value} />
+			<input {...props} value={value} />
+		</Label>
+	);
+}
+
+function RangeControl(props) {
+	return <BaseControl type="range" {...props} />;
+}
+
+function SelectControl({ label, value, options = [], ...props }) {
+	return (
+		<Label>
+			<LabelText>
+				{label} ({value})
+			</LabelText>
+			<select value={value} {...props}>
+				{options.map(item => (
+					<option
+						value={item.value}
+						key={item.value}
+						selected={item.value === value}
+					>
+						{item.label}
+					</option>
+				))}
+			</select>
 		</Label>
 	);
 }
@@ -166,7 +221,9 @@ const ScrollableContent = styled.div`
 const Label = styled.label`
 	display: block;
 	margin: 0 0 10px;
-	input {
+
+	input,
+	select {
 		display: block;
 		width: 100%;
 	}

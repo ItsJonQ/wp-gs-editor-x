@@ -62,6 +62,8 @@ const Example = () => {
 };
 
 const StyledContainer = styled.div`
+	text-align: var(--wp-font-text-align);
+
 	h1 {
 		font-size: var(--wp-font-size-h1);
 	}
