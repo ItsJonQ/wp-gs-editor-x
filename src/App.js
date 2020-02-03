@@ -32,6 +32,10 @@ function App() {
 			value: "right",
 			label: "Right",
 		},
+		{
+			value: "justify",
+			label: "Justified",
+		},
 	];
 
 	return (
