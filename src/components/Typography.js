@@ -83,7 +83,7 @@ const StyledContainer = styled.div`
 		font-size: var(--wp-font-size-h6);
 	}
 	p {
-		font-size: var(--wp-font-size-body);
+		font-size: var(--wp-font-size);
 	}
 	h1,
 	h2,
