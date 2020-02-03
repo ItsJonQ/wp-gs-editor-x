@@ -1,7 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Global } from "@emotion/core";
 import styled from "@emotion/styled";
-import { RangeControl, SelectControl, Section, Typography } from "./components";
+import {
+	ColorControl,
+	RangeControl,
+	SelectControl,
+	Section,
+	Typography,
+} from "./components";
 
 function App() {
 	const {
@@ -12,12 +18,24 @@ function App() {
 		setFontSize,
 		textAlign,
 		setTextAlign,
+		setTextColor,
+		textColor,
+		primaryColor,
+		backgroundColor,
+		setBackgroundColor,
+		setPrimaryColor,
 	} = useStyles();
 
 	const createInputHandler = fn => event => fn(event.target.value);
 	const handleOnChangeFontSize = createInputHandler(setFontSize);
 	const handleOnChangeFontScale = createInputHandler(setFontScale);
 	const handleOnChangeTextAlign = createInputHandler(setTextAlign);
+
+	const handleOnChangeTextColor = createInputHandler(setTextColor);
+	const handleOnChangeBackgroundColor = createInputHandler(
+		setBackgroundColor,
+	);
+	const handleOnChangePrimaryColor = createInputHandler(setPrimaryColor);
 
 	const textAlignOptions = [
 		{
@@ -76,6 +94,25 @@ function App() {
 							options={textAlignOptions}
 						/>
 					</SidebarPanel>
+					<SidebarPanel title="Color">
+						<ColorControl
+							label="Text"
+							value={textColor}
+							onChange={handleOnChangeTextColor}
+						/>
+
+						<ColorControl
+							label="Background"
+							value={backgroundColor}
+							onChange={handleOnChangeBackgroundColor}
+						/>
+
+						<ColorControl
+							label="Primary"
+							value={primaryColor}
+							onChange={handleOnChangePrimaryColor}
+						/>
+					</SidebarPanel>
 				</ScrollableContent>
 			</Sidebar>
 		</Editor>
@@ -90,6 +127,10 @@ const useStyles = () => {
 	const [fontSize, setFontSize] = useState(16);
 	const [fontScale, setFontScale] = useState(baseFontScale);
 	const [textAlign, setTextAlign] = useState("left");
+
+	const [primaryColor, setPrimaryColor] = useState("#0000ff");
+	const [backgroundColor, setBackgroundColor] = useState("#ffffff");
+	const [textColor, setTextColor] = useState("#000000");
 
 	const [styles, setStyles] = useState("");
 
@@ -126,6 +167,15 @@ const useStyles = () => {
 		nextStyle.push(`--wp-font-size-${size}: ${value}px;`);
 	});
 
+	nextStyle.push(`--wp-color-primary: ${primaryColor};`);
+	nextStyle.push(`--wp-color-text: ${textColor};`);
+	nextStyle.push(`--wp-color-background: ${backgroundColor};`);
+
+	nextStyle.push("}");
+
+	nextStyle.push("html {");
+	nextStyle.push(`background: var(--wp-color-background);`);
+	nextStyle.push(`color: var(--wp-color-text);`);
 	nextStyle.push("}");
 	nextStyle = nextStyle.join("\n");
 
@@ -145,6 +195,12 @@ const useStyles = () => {
 		lineHeight,
 		textAlign,
 		setTextAlign,
+		primaryColor,
+		setPrimaryColor,
+		backgroundColor,
+		setBackgroundColor,
+		textColor,
+		setTextColor,
 	};
 };
 
@@ -176,6 +232,7 @@ const Content = styled.div`
 `;
 
 const Sidebar = styled.div`
+	border-left: 1px solid #eee;
 	width: 300px;
 	height: 100%;
 `;
