@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Global } from "@emotion/core";
 import styled from "@emotion/styled";
-import { Section, Typography } from "./components";
+import { RangeControl, SelectControl, Section, Typography } from "./components";
 
 function App() {
 	const {
@@ -144,42 +144,6 @@ const useStyles = () => {
 	};
 };
 
-function BaseControl({ label, value, ...props }) {
-	return (
-		<Label>
-			<LabelText>
-				{label} ({value})
-			</LabelText>
-			<input {...props} value={value} />
-		</Label>
-	);
-}
-
-function RangeControl(props) {
-	return <BaseControl type="range" {...props} />;
-}
-
-function SelectControl({ label, value, options = [], ...props }) {
-	return (
-		<Label>
-			<LabelText>
-				{label} ({value})
-			</LabelText>
-			<select value={value} {...props}>
-				{options.map(item => (
-					<option
-						value={item.value}
-						key={item.value}
-						selected={item.value === value}
-					>
-						{item.label}
-					</option>
-				))}
-			</select>
-		</Label>
-	);
-}
-
 function SidebarPanel({ title, children }) {
 	return (
 		<Panel>
@@ -216,22 +180,6 @@ const ScrollableContent = styled.div`
 	height: 100%;
 	padding: 20px;
 	overflow-y: auto;
-`;
-
-const Label = styled.label`
-	display: block;
-	margin: 0 0 10px;
-
-	input,
-	select {
-		display: block;
-		width: 100%;
-	}
-`;
-
-const LabelText = styled.div`
-	font-size: 12px;
-	font-weight: bold;
 `;
 
 const Panel = styled.div`
