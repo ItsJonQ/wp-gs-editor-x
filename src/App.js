@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Global } from "@emotion/core";
+import colorize from "tinycolor2";
 import styled from "@emotion/styled";
 import {
+	Button,
 	ColorControl,
 	RangeControl,
 	SelectControl,
@@ -64,6 +66,9 @@ function App() {
 					<Content>
 						<Section title="Typography">
 							<Typography />
+						</Section>
+						<Section title="Button">
+							<Button />
 						</Section>
 					</Content>
 				</ScrollableContent>
@@ -146,6 +151,9 @@ const useStyles = () => {
 		baseLineHeightTitle * baseLineHeightTitleMultiplier
 	).toFixed(2);
 
+	const isPrimaryColorDark = colorize(primaryColor).isDark();
+	const primaryTextColor = isPrimaryColorDark ? "white" : "black";
+
 	let nextStyle = [":root {"];
 
 	nextStyle.push(`--wp-font-size: ${fontSize}px;`);
@@ -168,6 +176,7 @@ const useStyles = () => {
 	});
 
 	nextStyle.push(`--wp-color-primary: ${primaryColor};`);
+	nextStyle.push(`--wp-color-primary-text: ${primaryTextColor};`);
 	nextStyle.push(`--wp-color-text: ${textColor};`);
 	nextStyle.push(`--wp-color-background: ${backgroundColor};`);
 
