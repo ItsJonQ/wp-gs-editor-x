@@ -4,7 +4,9 @@ import colorize from "tinycolor2";
 import styled from "@emotion/styled";
 import {
 	Button,
+	Cover,
 	ColorControl,
+	ColorPalette,
 	RangeControl,
 	SelectControl,
 	Section,
@@ -26,6 +28,7 @@ function App() {
 		backgroundColor,
 		setBackgroundColor,
 		setPrimaryColor,
+		colorShades,
 	} = useStyles();
 
 	const createInputHandler = fn => event => fn(event.target.value);
@@ -63,64 +66,78 @@ function App() {
 			<Global styles={styles} />
 			<Container>
 				<ScrollableContent>
-					<Content>
-						<Section title="Typography">
-							<Typography />
-						</Section>
-						<Section title="Button">
-							<Button />
-						</Section>
-					</Content>
+					<BodyContent colors={colorShades} />
 				</ScrollableContent>
 			</Container>
 			<Sidebar>
 				<ScrollableContent>
-					<SidebarPanel title="Typography">
-						<RangeControl
-							label="Font Size"
-							onChange={handleOnChangeFontSize}
-							value={fontSize}
-							min="11"
-							max="32"
-						/>
-						<RangeControl
-							label="Font Scale"
-							onChange={handleOnChangeFontScale}
-							value={fontScale}
-							min="1.1"
-							max="1.5"
-							step="0.025"
-						/>
+					<Content>
+						<SidebarPanel title="Typography">
+							<RangeControl
+								label="Font Size"
+								onChange={handleOnChangeFontSize}
+								value={fontSize}
+								min="11"
+								max="32"
+							/>
+							<RangeControl
+								label="Font Scale"
+								onChange={handleOnChangeFontScale}
+								value={fontScale}
+								min="1.1"
+								max="1.3"
+								step="0.01"
+							/>
 
-						<SelectControl
-							label="Text Align"
-							value={textAlign}
-							onChange={handleOnChangeTextAlign}
-							options={textAlignOptions}
-						/>
-					</SidebarPanel>
-					<SidebarPanel title="Color">
-						<ColorControl
-							label="Text"
-							value={textColor}
-							onChange={handleOnChangeTextColor}
-						/>
+							<SelectControl
+								label="Text Align"
+								value={textAlign}
+								onChange={handleOnChangeTextAlign}
+								options={textAlignOptions}
+							/>
+						</SidebarPanel>
+						<SidebarPanel title="Color">
+							<ColorControl
+								label="Text"
+								value={textColor}
+								onChange={handleOnChangeTextColor}
+							/>
 
-						<ColorControl
-							label="Background"
-							value={backgroundColor}
-							onChange={handleOnChangeBackgroundColor}
-						/>
+							<ColorControl
+								label="Background"
+								value={backgroundColor}
+								onChange={handleOnChangeBackgroundColor}
+							/>
 
-						<ColorControl
-							label="Primary"
-							value={primaryColor}
-							onChange={handleOnChangePrimaryColor}
-						/>
-					</SidebarPanel>
+							<ColorControl
+								label="Primary"
+								value={primaryColor}
+								onChange={handleOnChangePrimaryColor}
+							/>
+						</SidebarPanel>
+					</Content>
 				</ScrollableContent>
 			</Sidebar>
 		</Editor>
+	);
+}
+
+function BodyContent({ colors }) {
+	return (
+		<>
+			<Cover />
+			<Section title="Typography">
+				<Typography />
+			</Section>
+			<Section title="Colors">
+				<ColorPalette colors={colors} />
+			</Section>
+			<Section title="Button">
+				<Button />
+			</Section>
+
+			<Section />
+		</>
 	);
 }
 
@@ -151,8 +168,9 @@ const useStyles = () => {
 		baseLineHeightTitle * baseLineHeightTitleMultiplier
 	).toFixed(2);
 
-	const isPrimaryColorDark = colorize(primaryColor).isDark();
-	const primaryTextColor = isPrimaryColorDark ? "white" : "black";
+	const primaryTextColor = colorize
+		.mostReadable(primaryColor, [textColor, backgroundColor])
+		.toHexString();
 
 	let nextStyle = [":root {"];
 
@@ -167,7 +185,7 @@ const useStyles = () => {
 		h3: 3,
 		h4: 2,
 		h5: 1,
-		h6: 0.92,
+		h6: 0.5,
 	};
 
 	Object.entries(typeSizes).forEach(([size, scale]) => {
@@ -179,6 +197,36 @@ const useStyles = () => {
 	nextStyle.push(`--wp-color-primary-text: ${primaryTextColor};`);
 	nextStyle.push(`--wp-color-text: ${textColor};`);
 	nextStyle.push(`--wp-color-background: ${backgroundColor};`);
+
+	const colors = [
+		{
+			name: "text",
+			color: textColor,
+		},
+		{
+			name: "background",
+			color: backgroundColor,
+		},
+		{
+			name: "primary",
+			color: primaryColor,
+		},
+	];
+
+	const colorShades = colors.map(color => ({
+		...color,
+		color: getColorShades(color.color),
+	}));
+
+	colors.forEach(color => {
+		const colorShades = getColorShades(color.color);
+		const colorShadeIndex = Object.keys(colorShades);
+
+		colorShadeIndex.forEach(shade => {
+			const value = colorShades[shade];
+			nextStyle.push(`--wp-color-${color.name}-${shade}: ${value};`);
+		});
+	});
 
 	nextStyle.push("}");
 
@@ -210,6 +258,7 @@ const useStyles = () => {
 		setBackgroundColor,
 		textColor,
 		setTextColor,
+		colorShades,
 	};
 };
 
@@ -234,21 +283,19 @@ const Container = styled.div`
 	height: 100%;
 `;
 
-const Content = styled.div`
-	margin: auto;
-	max-width: 720px;
-	padding: 0 15px 20vh;
-`;
-
 const Sidebar = styled.div`
 	border-left: 1px solid #eee;
 	width: 300px;
 	height: 100%;
 `;
 
+const Content = styled.div`
+	padding: 20px;
+`;
+
 const ScrollableContent = styled.div`
 	height: 100%;
-	padding: 20px;
+	padding: 0;
 	overflow-y: auto;
 `;
 
@@ -259,5 +306,23 @@ const PanelTitle = styled.div`
 	font-weight: bold;
 	margin-bottom: 12px;
 `;
+
+function getColorShades(color) {
+	return {
+		light20: colorize(color)
+			.lighten(20)
+			.toHexString(),
+		light10: colorize(color)
+			.lighten(10)
+			.toHexString(),
+		base: colorize(color).toHexString(),
+		dark10: colorize(color)
+			.darken(10)
+			.toHexString(),
+		dark20: colorize(color)
+			.darken(20)
+			.toHexString(),
+	};
+}
 
 export default App;

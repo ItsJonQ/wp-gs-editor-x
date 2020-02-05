@@ -1,21 +1,34 @@
 import React from "react";
 import styled from "@emotion/styled";
+import { Heading } from "./Heading";
 
 export const Section = ({ children, title }) => {
 	return (
 		<SectionView>
-			{title && <TitleView>{title}</TitleView>}
-			{children}
+			<Content>
+				{title && (
+					<TitleView>
+						<Heading as="h3">{title}</Heading>
+					</TitleView>
+				)}
+				{children}
+			</Content>
 		</SectionView>
 	);
 };
 
 const SectionView = styled.div`
-	margin: 40px 0 80px;
+	padding: 15vh 0;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.15);
 `;
 
 const TitleView = styled.div`
-	font-size: 16px;
-	font-weight: bold;
-	margin-bottom: 24px;
+	margin-bottom: 7.5vh;
+	margin-top: -2.5vh;
+`;
+
+const Content = styled.div`
+	margin: auto;
+	max-width: 720px;
+	padding: 0 15px;
 `;
